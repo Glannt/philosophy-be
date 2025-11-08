@@ -10,6 +10,14 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+
+app.options('/', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*'); // hoặc thay bằng domain frontend
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(204);
+});
+
 app.use(express.json()); // nhận JSON từ frontend
 
 // File lưu user
@@ -113,15 +121,17 @@ app.post('/', async (req, res) => {
 
         // Prompt chuyên sâu, biến AI thành triết gia kinh tế
         const fullMessage = `
-Bạn là một triết gia kinh tế uyên thâm, chuyên về kinh tế chính trị và kinh tế thị trường hướng tới chủ nghĩa xã hội.
-Nhiệm vụ của bạn là:
-1. Chỉ trả lời về kinh tế thị trường hướng tới chủ nghĩa xã hội.
-2. Giải thích các đặc trưng cơ bản, cơ chế vận hành, ưu – nhược điểm.
-3. Minh họa bằng các ví dụ thực tiễn hoặc lý thuyết nổi bật.
-4. Không đề cập đến chính trị, văn hóa hay vấn đề xã hội khác.
-5. Trình bày một cách logic, sâu sắc và có góc nhìn triết học.
+Bạn là chuyên gia triết học kinh tế, tập trung vào kinh tế thị trường định hướng xã hội.
 
-Câu hỏi của người dùng: "${message}"
+Yêu cầu:
+1. Chỉ phân tích mô hình kinh tế thị trường định hướng xã hội.
+2. Trình bày đặc trưng, cơ chế vận hành, ưu – nhược điểm.
+3. Đưa ví dụ lý thuyết hoặc thực tiễn.
+4. Không nhắc đến chính trị, văn hóa hay xã hội.
+5. Diễn giải logic, súc tích, mang chiều sâu triết học.
+6. Nếu người dùng chỉ chào hỏi, hãy chào lại ngắn gọn và chưa trả lời nội dung chính.
+
+Câu hỏi: "${message}"
 `;
 
         const response = await ai.models.generateContent({
@@ -137,6 +147,7 @@ Câu hỏi của người dùng: "${message}"
     }
   } catch (err) {
     console.error('❌ Lỗi server:', err);
+
     res.status(500).json({ success: false, message: 'Lỗi server.' });
   }
 });
